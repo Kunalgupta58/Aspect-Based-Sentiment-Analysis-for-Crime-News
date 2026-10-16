@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Explore recent crime news and automated sentiment analysis of people mentioned in the articles."
+    />
+    <title>Crime News — Sentiment Brief</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Sentiment Brief home">
+          <span class="brand-mark">SB</span>
+          <span>Sentiment Brief</span>
+        </a>
+        <span class="live-indicator"><i></i> NEWS MONITOR</span>
+      </header>
+      <main>
+        <section class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">ASPECT-BASED SENTIMENT ANALYSIS</p>
+            <h1>Crime news,<br /><em>in context.</em></h1>
+            <p class="intro">
+              Browse recent crime-related news and see the model's predicted
+              sentiment toward people mentioned in each article.
+            </p>
+          </div>
+          <aside class="refresh-card">
+            <span class="eyebrow">UPDATE THE BRIEF</span>
+            <label for="hours">News from the past</label>
+            <select id="hours">
+              <option value="6">6 hours</option>
+              <option value="12">12 hours</option>
+              <option value="24" selected>24 hours</option>
+              <option value="48">48 hours</option>
+              <option value="72">72 hours</option>
+            </select>
+            <button id="refresh" type="button">Fetch and analyze <span>↗</span></button>
+            <p id="status" class="status" role="status" aria-live="polite">
+              Ready to load the latest analysis.
+            </p>
+          </aside>
+        </section>
+
+        <section id="notice" class="notice" hidden></section>
+
+        <section class="metrics" aria-label="Analysis summary">
+          <article class="metric"><span>ARTICLES</span><strong id="article-count">—</strong></article>
+          <article class="metric"><span>PEOPLE MENTIONED</span><strong id="people-count">—</strong></article>
+          <article class="metric"><span>PROFILE RESULTS</span><strong id="profile-count">—</strong></article>
+          <article class="metric"><span>NEGATIVE PREDICTIONS</span><strong id="negative-count">—</strong></article>
+        </section>
+
+        <section class="results-grid">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">WHO'S IN THE COVERAGE</p>
+              <h2>People &amp; sentiment</h2>
+            </div>
+            <input id="search" type="search" placeholder="Search names or articles" aria-label="Search names or articles" />
+          </div>
+          <div id="profiles" class="profiles empty-state">Load an analysis to see profile results.</div>
+
+          <div class="section-heading article-heading">
+            <div>
+              <p class="eyebrow">THE SOURCE STORIES</p>
+              <h2>Latest articles</h2>
+            </div>
+            <span id="sources" class="source-note"></span>
+          </div>
+          <div id="articles" class="articles empty-state">Articles will appear here with the analysis results.</div>
+        </section>
+
+        <p class="disclaimer">
+          Sentiment labels are automated model predictions, not verified facts or legal conclusions.
+          Read the linked source article and consider its context.
+        </p>
+      </main>
+      <footer><span>Sentiment Brief</span><span>Independent news analysis · Sources linked with each story</span></footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

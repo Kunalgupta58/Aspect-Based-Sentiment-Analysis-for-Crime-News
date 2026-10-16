@@ -1,0 +1,10 @@
+beautifulsoup4==4.13.4
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+nltk==3.8.1
+pandas==2.3.1
+python-dateutil==2.9.0.post0
+requests==2.32.4
+spacy==3.8.7
+streamlit==1.48.1
+torch==2.7.1
+transformers==4.53.2
