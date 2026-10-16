@@ -84,8 +84,8 @@ No API key is required by the current code. Do not add one as a frontend variabl
 
 The repository includes a root `Dockerfile` and Space metadata in `README.md`. The Docker image installs CPU-only PyTorch, downloads the NLTK tokenizer, and starts FastAPI on port `7860`.
 
-1. Create a new Space at [huggingface.co/new-space](https://huggingface.co/new-space). Choose **Docker** as the SDK and **CPU Basic** hardware. The free hardware limits and sleep policy can change; free Spaces may pause when idle and cold-start on the next request.
-2. Keep the Space private if you want the backend source to remain private. Authenticate Git with a Hugging Face access token; never commit the token to this repository.
+1. Create a new Space at [huggingface.co/new-space](https://huggingface.co/new-space). Choose **Docker** as the SDK and **CPU Basic** hardware (currently listed as 2 vCPUs and 16 GB RAM on the [Hugging Face pricing page](https://huggingface.co/pricing)). Free Spaces may pause when idle and cold-start on the next request.
+2. For a public Vercel website to call the API directly, make the Space **Public**. This also makes its Space repository and backend source public; do not upload secrets. Your GitHub repository can remain private. A private Space needs an authenticated server-side proxy; never put a Hugging Face token in Vercel's `VITE_` variables or browser code.
 3. From the project root, install and sign in to the Hugging Face CLI. When prompted, enter a Hugging Face access token in the terminal; do not paste it into chat or commit it.
 
    ```bash
