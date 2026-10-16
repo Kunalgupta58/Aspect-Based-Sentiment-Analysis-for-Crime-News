@@ -94,8 +94,18 @@ def run_job(job_id: str, hours_back: int) -> None:
     with jobs_lock:
         jobs[job_id]["status"] = "running"
 
+    def report_progress(message: str) -> None:
+        logger.info("News analysis job %s: %s", job_id, message)
+        with jobs_lock:
+            job = jobs.get(job_id)
+            if job is not None:
+                job["progress"] = message
+
     try:
-        result = run_analysis(hours_back=hours_back)
+        result = run_analysis(
+            hours_back=hours_back,
+            progress_callback=report_progress,
+        )
         with jobs_lock:
             latest_result = result
             jobs[job_id].update(status="completed")

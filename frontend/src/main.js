@@ -191,7 +191,11 @@ async function runAnalysis() {
       if (job.status === "failed") {
         throw new Error(job.error || "The analysis could not be completed.");
       }
-      setStatus(job.status === "queued" ? "Analysis queued…" : "Fetching and analyzing articles. This can take a few minutes…");
+      setStatus(
+        job.status === "queued"
+          ? "Analysis queued…"
+          : job.progress || "Fetching and analyzing articles. This can take a few minutes…"
+      );
     }
   } catch (error) {
     setStatus(error.message, true);

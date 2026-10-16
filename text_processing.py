@@ -92,6 +92,8 @@ def analyze_people_sentiment(sentences, persons, pipe):
                 for person, sentence in batch
             ],
             batch_size=batch_size,
+            truncation=True,
+            max_length=256,
         )
         if len(results) != len(batch):
             raise RuntimeError(

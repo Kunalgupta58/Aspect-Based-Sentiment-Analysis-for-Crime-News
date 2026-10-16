@@ -5,6 +5,7 @@ import logging
 import os
 import subprocess
 import sys
+from collections.abc import Callable
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
@@ -85,6 +86,7 @@ def load_analysis_models():
 def main(
     feed_urls: list[str] | None = None,
     hours_back: int = 24,
+    progress_callback: Callable[[str], None] | None = None,
 ) -> dict:
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, "reconfigure"):
@@ -126,11 +128,17 @@ def main(
 
     print("loading transformer and spaCy models")
     absapipe, nlp = load_analysis_models()
+    if progress_callback is not None:
+        progress_callback("Models loaded; starting analysis.")
 
     all_profiles = []
     negative_profiles = []
-    for art in articles:
+    for article_index, art in enumerate(articles, start=1):
         title = art["title"]
+        progress = f"Analyzing article {article_index}/{len(articles)}: {title}"
+        logging.info(progress)
+        if progress_callback is not None:
+            progress_callback(progress)
         content = clean_text(art["content"])
         article_text = f"{title}. {content}"
         sentences = break_into_sentences(content)
