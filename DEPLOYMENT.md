@@ -61,7 +61,7 @@ If you create a new GitHub repository, create it as **Private**, then push the p
 4. Set the **Build Command** to:
 
    ```bash
-   python -m pip install --upgrade pip && python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.7.1 && python -m pip install -r requirements.txt -r backend-requirements.txt && python -m nltk.downloader punkt punkt_tab
+   python -m pip install --upgrade pip && python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.7.1 && python -m pip install -r requirements.txt -r backend-requirements.txt && python -m nltk.downloader -d /opt/render/nltk_data punkt punkt_tab
    ```
 
 5. Set the **Start Command** to:
@@ -71,8 +71,11 @@ If you create a new GitHub repository, create it as **Private**, then push the p
    ```
 
 6. Choose an instance with enough RAM and disk for PyTorch, spaCy, and the sentiment model. Check Render's current plans and limits; model download and analysis need more resources than the static website.
-7. Create the service. The first build installs large dependencies and can take several minutes. Copy the public service URL once it is deployed, for example `https://your-api-name.onrender.com`.
-8. Test `https://your-api-name.onrender.com/api/health`; it should return `{"status":"ok"}`. `https://your-api-name.onrender.com/docs` should show the API endpoints.
+7. In the Render service's **Environment** settings, add:
+   - **Key:** `NLTK_DATA`
+   - **Value:** `/opt/render/nltk_data`
+8. Create the service. The first build installs large dependencies and can take several minutes. Copy the public service URL once it is deployed, for example `https://your-api-name.onrender.com`.
+9. Test `https://your-api-name.onrender.com/`; it should show a message confirming the API is running, with links to health and documentation. `https://your-api-name.onrender.com/api/health` should return `{"status":"ok"}`, and `/docs` should show the API endpoints.
 
 No API key is required by the current code. Do not add one as a frontend variable.
 
@@ -121,6 +124,7 @@ If you add a Vercel preview deployment, its hostname is different. Add that exac
 |---|---|
 | Render build cannot find `requirements.txt` or `api.py` | Its **Root Directory** must point to the folder containing those files. |
 | Render says no matching `torch==2.7.1` distribution is available | The build is using an incompatible Python version (the log showed Python 3.14). Ensure `.python-version` containing `3.11.11` is committed in the Render service's root directory and deployed. Alternatively, set Render's `PYTHON_VERSION` environment variable to `3.11.11`, then redeploy. Confirm the next build log uses Python 3.11.x. |
+| Analysis reports that NLTK `punkt` is missing | Set Render environment variable `NLTK_DATA` to `/opt/render/nltk_data` and make sure the build command downloads to that same directory with `python -m nltk.downloader -d /opt/render/nltk_data punkt punkt_tab`. Save the settings, redeploy, and rerun the analysis. |
 | Render reports out-of-memory or the analysis is terminated | Use an instance with more memory. PyTorch, spaCy, and the transformer model are resource-heavy. |
 | `/api/health` works, but the website reports a network/CORS error | Set Render's `ALLOWED_ORIGINS` to the exact Vercel origin, save, and restart Render. Check for a typo or trailing slash. |
 | Website says the API URL is not configured | Set Vercel's `VITE_API_URL`, then redeploy the website. |

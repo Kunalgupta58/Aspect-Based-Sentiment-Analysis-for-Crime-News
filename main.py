@@ -93,7 +93,20 @@ def main(
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
-    nltk.data.find("tokenizers/punkt")
+    nltk_data_dir = Path(
+        os.environ.get(
+            "NLTK_DATA",
+            Path(__file__).resolve().parent / "nltk_data",
+        )
+    )
+    nltk.data.path.insert(0, str(nltk_data_dir))
+    try:
+        nltk.data.find("tokenizers/punkt")
+    except LookupError as error:
+        raise RuntimeError(
+            "The NLTK punkt tokenizer is missing. Install it during deployment "
+            "with `python -m nltk.downloader -d nltk_data punkt punkt_tab`."
+        ) from error
 
     print(f">>> Fetching live crime news from the last {hours_back} hours >>>")
     articles = get_articles(feed_urls=feed_urls, hours_back=hours_back)

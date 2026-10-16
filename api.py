@@ -101,8 +101,17 @@ def run_job(job_id: str, hours_back: int) -> None:
             jobs[job_id].update(status="completed")
     except Exception as error:
         logger.exception("News analysis job %s failed", job_id)
+        if isinstance(error, LookupError) or (
+            isinstance(error, RuntimeError) and "NLTK punkt tokenizer" in str(error)
+        ):
+            public_error = (
+                "The analysis server is missing the NLTK punkt tokenizer. "
+                "Check the Render build command and redeploy."
+            )
+        else:
+            public_error = "Analysis failed. Check the backend service logs for details."
         with jobs_lock:
-            jobs[job_id].update(status="failed", error=str(error))
+            jobs[job_id].update(status="failed", error=public_error)
 
 
 def read_latest_saved_result() -> dict | None:
@@ -123,6 +132,15 @@ def read_latest_saved_result() -> dict | None:
 @app.get("/api/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/")
+def root() -> dict[str, str]:
+    return {
+        "message": "Crime News Sentiment API is running.",
+        "health": "/api/health",
+        "docs": "/docs",
+    }
 
 
 @app.get("/api/results")

@@ -82,7 +82,7 @@ For the complete step-by-step guide, including local testing, GitHub privacy, Re
 3. Use this build command:
 
    ```bash
-   python -m pip install --upgrade pip && python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.7.1 && python -m pip install -r requirements.txt -r backend-requirements.txt && python -m nltk.downloader punkt punkt_tab
+   python -m pip install --upgrade pip && python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.7.1 && python -m pip install -r requirements.txt -r backend-requirements.txt && python -m nltk.downloader -d /opt/render/nltk_data punkt punkt_tab
    ```
 
 4. Use this start command:
