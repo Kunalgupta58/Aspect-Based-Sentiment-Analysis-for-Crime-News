@@ -57,7 +57,7 @@ If you create a new GitHub repository, create it as **Private**, then push the p
 
 1. Sign in to Render and create a **Web Service** connected to the private GitHub repository. Authorize Render to access that repository if prompted.
 2. Set **Root Directory** to the project folder containing `api.py` and `requirements.txt`. If those files are at the repository root, leave this field blank. If the repository has an outer folder around the project, enter that folder's repository-relative path.
-3. Set the runtime to **Python 3** and select Python **3.11** if Render offers a version setting.
+3. Set the runtime to **Python 3**. This repository includes a `.python-version` file pinned to Python **3.11.11**; confirm the Render build log says it is using Python 3.11.x, not the default Python 3.14.
 4. Set the **Build Command** to:
 
    ```bash
@@ -120,6 +120,7 @@ If you add a Vercel preview deployment, its hostname is different. Add that exac
 | Symptom | What to check |
 |---|---|
 | Render build cannot find `requirements.txt` or `api.py` | Its **Root Directory** must point to the folder containing those files. |
+| Render says no matching `torch==2.7.1` distribution is available | The build is using an incompatible Python version (the log showed Python 3.14). Ensure `.python-version` containing `3.11.11` is committed in the Render service's root directory and deployed. Alternatively, set Render's `PYTHON_VERSION` environment variable to `3.11.11`, then redeploy. Confirm the next build log uses Python 3.11.x. |
 | Render reports out-of-memory or the analysis is terminated | Use an instance with more memory. PyTorch, spaCy, and the transformer model are resource-heavy. |
 | `/api/health` works, but the website reports a network/CORS error | Set Render's `ALLOWED_ORIGINS` to the exact Vercel origin, save, and restart Render. Check for a typo or trailing slash. |
 | Website says the API URL is not configured | Set Vercel's `VITE_API_URL`, then redeploy the website. |
