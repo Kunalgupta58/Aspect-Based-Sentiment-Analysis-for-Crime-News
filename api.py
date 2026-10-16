@@ -105,8 +105,8 @@ def run_job(job_id: str, hours_back: int) -> None:
             isinstance(error, RuntimeError) and "NLTK punkt tokenizer" in str(error)
         ):
             public_error = (
-                "The analysis server is missing the NLTK punkt tokenizer. "
-                "Check the Render build command and redeploy."
+                "The analysis server could not find or download the NLTK punkt "
+                "tokenizer. Check Render's NLTK_DATA setting and service logs."
             )
         else:
             public_error = "Analysis failed. Check the backend service logs for details."

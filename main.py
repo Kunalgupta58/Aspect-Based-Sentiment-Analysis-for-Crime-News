@@ -103,10 +103,18 @@ def main(
     try:
         nltk.data.find("tokenizers/punkt")
     except LookupError as error:
-        raise RuntimeError(
-            "The NLTK punkt tokenizer is missing. Install it during deployment "
-            "with `python -m nltk.downloader -d nltk_data punkt punkt_tab`."
-        ) from error
+        nltk.download(
+            "punkt",
+            download_dir=str(nltk_data_dir),
+            quiet=True,
+        )
+        try:
+            nltk.data.find("tokenizers/punkt")
+        except LookupError:
+            raise RuntimeError(
+                "The NLTK punkt tokenizer is missing. Check that the deployment "
+                "can download NLTK data and that NLTK_DATA is writable."
+            ) from error
 
     print(f">>> Fetching live crime news from the last {hours_back} hours >>>")
     articles = get_articles(feed_urls=feed_urls, hours_back=hours_back)

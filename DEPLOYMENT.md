@@ -74,6 +74,7 @@ If you create a new GitHub repository, create it as **Private**, then push the p
 7. In the Render service's **Environment** settings, add:
    - **Key:** `NLTK_DATA`
    - **Value:** `/opt/render/nltk_data`
+   The API also attempts to download `punkt` into this directory when an analysis starts if the build-time download was unavailable.
 8. Create the service. The first build installs large dependencies and can take several minutes. Copy the public service URL once it is deployed, for example `https://your-api-name.onrender.com`.
 9. Test `https://your-api-name.onrender.com/`; it should show a message confirming the API is running, with links to health and documentation. `https://your-api-name.onrender.com/api/health` should return `{"status":"ok"}`, and `/docs` should show the API endpoints.
 
