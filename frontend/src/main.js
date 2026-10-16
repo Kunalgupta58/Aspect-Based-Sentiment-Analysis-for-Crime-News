@@ -33,14 +33,42 @@ function showNotice(message, kind = "info") {
   noticeElement.textContent = message;
 }
 
+const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
 async function request(path, options = {}) {
   if (!apiUrl) {
     throw new Error("The API URL has not been configured for this website.");
   }
-  const response = await fetch(`${apiUrl}${path}`, {
-    headers: { "Content-Type": "application/json" },
-    ...options,
-  });
+  const isGet = (options.method || "GET").toUpperCase() === "GET";
+  const attempts = isGet ? 5 : 1;
+  let response;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      response = await fetch(`${apiUrl}${path}`, {
+        headers: { "Content-Type": "application/json" },
+        ...options,
+      });
+    } catch (error) {
+      if (attempt + 1 === attempts) {
+        if (error instanceof TypeError) {
+          throw new Error(
+            "The analysis API is unreachable. Check that the Render service is running and allows this website."
+          );
+        }
+        throw error;
+      }
+      await wait(1000 * 2 ** attempt);
+      continue;
+    }
+
+    if (response.status >= 500 && attempt + 1 < attempts) {
+      await wait(1000 * 2 ** attempt);
+      continue;
+    }
+    break;
+  }
+
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new Error(payload.detail || `Request failed (${response.status}).`);
@@ -168,8 +196,6 @@ async function loadResults() {
     showNotice(error.message, "error");
   }
 }
-
-const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 async function runAnalysis() {
   refreshButton.disabled = true;
