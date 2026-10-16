@@ -116,7 +116,7 @@ def run_job(job_id: str, hours_back: int) -> None:
         ):
             public_error = (
                 "The analysis server could not find or download the NLTK punkt "
-                "tokenizer. Check Render's NLTK_DATA setting and service logs."
+                "tokenizer. Check the backend NLTK_DATA setting and service logs."
             )
         else:
             public_error = "Analysis failed. Check the backend service logs for details."

@@ -5,7 +5,7 @@ This guide deploys the public website to **Vercel** and the Python news/sentimen
 ## How the deployment is split
 
 - **Vercel** serves the website files in `frontend/`. Anything sent to a visitor's browser, including JavaScript, can be inspected.
-- **Render** runs `api.py`, the scraper, spaCy, and the sentiment model. The Python source and model files are not sent to website visitors' browsers.
+- **Render or Hugging Face Spaces** runs `api.py`, the scraper, spaCy, and the sentiment model. The Python source and model files are not sent to website visitors' browsers.
 - Keep the GitHub repository **private** if you do not want the source repository to be publicly visible. Vercel and Render still need repository access to build and run it, and those providers can access the deployed code.
 - The API returns article metadata and original story links, not the scraped article body. It does return the analysis results requested by the public website.
 
@@ -80,6 +80,28 @@ If you create a new GitHub repository, create it as **Private**, then push the p
 
 No API key is required by the current code. Do not add one as a frontend variable.
 
+### Alternative: Deploy the API on Hugging Face Spaces
+
+The repository includes a root `Dockerfile` and Space metadata in `README.md`. The Docker image installs CPU-only PyTorch, downloads the NLTK tokenizer, and starts FastAPI on port `7860`.
+
+1. Create a new Space at [huggingface.co/new-space](https://huggingface.co/new-space). Choose **Docker** as the SDK and **CPU Basic** hardware. The free hardware limits and sleep policy can change; free Spaces may pause when idle and cold-start on the next request.
+2. Keep the Space private if you want the backend source to remain private. Authenticate Git with a Hugging Face access token; never commit the token to this repository.
+3. From the project root, install and sign in to the Hugging Face CLI. When prompted, enter a Hugging Face access token in the terminal; do not paste it into chat or commit it.
+
+   ```bash
+   python -m pip install --upgrade huggingface_hub
+   hf auth login
+   hf upload YOUR_USERNAME/YOUR_SPACE . --repo-type space --exclude .git/ venv/ .venv/ frontend/node_modules/
+   ```
+
+   Replace `YOUR_USERNAME/YOUR_SPACE` with the Space repository ID. This uploads the Dockerfile, Space README, API source, requirements, and saved `outputs/` files without uploading Git history or local dependencies.
+4. Wait for the Space build to finish. Its API URL is `https://<username>-<space-name>.hf.space`. Verify `/api/health` returns `{"status":"ok"}`.
+5. In the Space's **Settings → Variables and secrets**, add `ALLOWED_ORIGINS` with the exact Vercel website origin, such as `https://your-site.vercel.app` (no trailing slash). Save and restart the Space.
+6. In Vercel, set `VITE_API_URL` to the Space API URL with no trailing slash, then redeploy the frontend.
+7. Test the Vercel site. Keep Render running until the Space-backed website is confirmed working; then you can stop the Render service.
+
+The free CPU Space can be slower than a paid backend and may sleep when idle, so it is not guaranteed to stay responsive 24/7. The API's job state is held in process memory; a Space restart will interrupt an in-progress analysis.
+
 ## 4. Deploy the website on Vercel
 
 1. In Vercel, choose **Add New → Project** and import the same private GitHub repository.
@@ -90,7 +112,7 @@ No API key is required by the current code. Do not add one as a frontend variabl
    - **Install Command:** `npm install`
 4. Under **Environment Variables**, add:
    - **Name:** `VITE_API_URL`
-   - **Value:** the Render URL copied above, with no trailing slash. Example: `https://your-api-name.onrender.com`
+   - **Value:** the backend URL copied above, with no trailing slash. For example, `https://your-api-name.onrender.com` or `https://<username>-<space-name>.hf.space`.
    - Enable it for the deployment environments you use (Production, and Preview if needed).
 5. Deploy the Vercel project. Copy the website's production origin, for example `https://your-site.vercel.app`. The origin is the scheme and hostname only; do not include a path or trailing slash.
 
@@ -98,7 +120,7 @@ No API key is required by the current code. Do not add one as a frontend variabl
 
 ## 5. Allow the website to call the API
 
-1. Return to the Render service and open **Environment**.
+1. Open the backend host's environment settings (Render **Environment** or Hugging Face Space **Settings → Variables and secrets**).
 2. Add or edit:
    - **Key:** `ALLOWED_ORIGINS`
    - **Value:** your exact Vercel production origin, for example `https://your-site.vercel.app`
@@ -108,7 +130,7 @@ No API key is required by the current code. Do not add one as a frontend variabl
    https://your-site.vercel.app,https://www.example.com
    ```
 
-4. Save the environment change and restart/redeploy the Render service.
+4. Save the environment change and restart/redeploy the backend service.
 5. Open the Vercel site, confirm that the saved results load or that it explains there are no results yet, then click **Fetch and analyze**. The first request may take several minutes while the API downloads and loads the model.
 
 If you add a Vercel preview deployment, its hostname is different. Add that exact origin to `ALLOWED_ORIGINS` if browser requests from that preview need to work.
